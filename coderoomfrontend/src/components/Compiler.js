@@ -1,7 +1,8 @@
 
-import React, { Component, useState } from "react";
+import React, { Component, useEffect, useState } from "react";
 import "./Compiler.css";
-import TextEditor from '../components/TextEditor/TextEditor'
+// import TextEditor from '../components/TextEditor/TextEditor'
+import FirePad from "./FirePad/FirePad";
 
 
 const API_KEY = process.env.REACT_APP_JUDGE0_KEY
@@ -11,9 +12,75 @@ const Compiler = () => {
 
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
-  const [language_id, setLanguage_id] = useState(71);
+  const [language_id, setLanguage_id] = useState(63);
+  const [language_name, setLanguage_name] = useState('javascript');
   const [user_input, setUser_input] = useState('');
+  const [codeLines, setCodeLines] = useState()
 
+
+  // const handleLanguageChange = (target) => {
+  //   setLanguage_id(target.value)
+  //   let languageByName
+  //   switch(target.value){
+  //     case '63':
+  //       languageByName=  'javascript'
+  //       break
+  //     case '75':
+  //       languageByName = 'c'
+  //       break
+  //     case '54':
+  //       languageByName = 'c++'
+  //       break
+  //     case '62':
+  //       languageByName = 'java'
+  //       break
+  //     case '71':
+  //       languageByName = 'python'
+  //       break
+  //   }
+  //   setLanguage_name(languageByName)
+  // }
+
+
+  const observeCodeChange = () => {
+    //add 'onChange-like' handler to each individual line
+    const  codeLines = document.querySelector('.CodeMirror-code')
+
+    //for each mutation to the .CodeMirror-code div call to get text from editor
+    function callback(mutationList, observer) {
+      getTextFromCodeEditor()
+    }
+    const observerOptions = {
+      childList: true,
+      // attributes: true,
+      subtree: true
+    }
+    //observe changes in the "div" add similiar functionality to an onChange callback
+    const observer = new MutationObserver(callback);
+    observer.observe(codeLines, observerOptions);
+  }
+
+  const getTextFromCodeEditor = () => {
+    const lines = document.querySelectorAll('.CodeMirror-line ')
+    let textFromCode = []
+    for(let line of lines){
+      textFromCode.push(line.innerText)
+    }
+    //filters out ''ZERO WIDTH SPACE' (U+200B)' that was appearing at the end of blank lines
+    let filteredCode = textFromCode.filter(text => {
+      return /\S+/.test(text.replace(/\u200B/g,''))
+    }
+    )
+    //joins code with a new line char
+    const parsedCodeText = filteredCode.join('\n')
+    setInput(parsedCodeText)
+  }
+
+
+    useEffect(() => {
+      getTextFromCodeEditor()
+      observeCodeChange()
+    }, [])
 
 
   const submit = async (e) => {
@@ -50,9 +117,6 @@ const Compiler = () => {
       stderr: null,
       compile_output: null,
     };
-
-
-
     
     while (
       jsonGetSolution.status.description !== "Accepted" &&
@@ -78,7 +142,6 @@ const Compiler = () => {
         console.log('jsongetsolution', jsonGetSolution)
       }
     }
-    console.log('here')
     if (jsonGetSolution.stdout) {
       const outputSolution = atob(jsonGetSolution.stdout);
 
@@ -107,9 +170,12 @@ const Compiler = () => {
             <label for="solution ">
               <span className="badge badge-info heading mt-2 ">
                 <i className=""></i> Code Here
+                Language: {language_name}
+
               </span>
             </label>
-            <TextEditor fieldName={'solution'} fieldId={'source'} onChangeFunction={setInput} classNames="source"/>
+            {/* <TextEditor fieldName={'solution'} fieldId={'source'} onChangeFunction={setInput} classNames="source"/> */}
+            <FirePad language_name={language_name} />
 
 
             <button
@@ -120,12 +186,12 @@ const Compiler = () => {
               <i class="fas fa-cog fa-fw"></i> Run
             </button>
 
-            <label for="tags" className="mr-1">
+            {/* <label for="tags" className="mr-1">
               <b className="heading">Language:</b>
             </label>
             <select
               value={language_id}
-              onChange={(event) => setLanguage_id(event.target.value)}
+              onChange={(event) => handleLanguageChange(event.target)}
               id="tags"
               className="form-control form-inline mb-2 language"
             >
@@ -134,14 +200,14 @@ const Compiler = () => {
               <option value="54">C++</option>
               <option value="62">Java</option>
               <option value="71">Python</option>
-            </select>
+            </select> */}
           </div>
           <div className="col-5">
             <div>
               <span className="badge badge-info heading my-2 ">
                 <i className="fas fa-exclamation fa-fw fa-md"></i> Output
               </span>
-              <textarea id="output"></textarea>
+              <textarea id="output" disabled></textarea>
             </div>
           </div>
         </div>

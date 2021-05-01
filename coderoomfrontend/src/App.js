@@ -1,5 +1,14 @@
 
 import Compiler from './components/Compiler'
+import Editor from "@monaco-editor/react";
+import FirePad from "./components/FirePad/FirePad"
+
+// var firepadDiv = document.getElementById('firepad');
+// var firepadRef = firebase.database().ref();
+// var codeMirror = CodeMirror(firepadDiv, { lineWrapping: true });
+// var firepad = Firepad.fromCodeMirror(firepadRef, codeMirror,
+//     { richTextShortcuts: true, richTextToolbar: true });
+
 
 import {
   BrowserRouter as Router,
@@ -10,6 +19,8 @@ import {
 import { v4 as uuidV4 } from "uuid"
 
 function App() {
+
+  
   return (
     <Router>
       <Switch>
@@ -20,6 +31,7 @@ function App() {
           <Compiler />
         </Route>
       </Switch>
+          {/* <FirePad /> */}
     </Router>
   )
 }
