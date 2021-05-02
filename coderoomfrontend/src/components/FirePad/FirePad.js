@@ -14,6 +14,21 @@ console.log(URL_FB)
 const FirePad = ({language_name}) => {
 const codeMirrorRef= useRef()
 
+  const commentType = (() =>{
+    let comment;
+    switch(language_name){
+      case 'javascript':
+      case 'c':
+      case 'c++':
+      case 'java':
+        comment = ['/*', '*/']
+        break
+      case 'python':
+        return comment = [`'''`, `'''`]
+    }
+    return comment
+  })()
+
 
   useEffect(() =>{
     //// Initialize Firebase.
@@ -37,8 +52,9 @@ const codeMirrorRef= useRef()
     });
       codeMirrorRef.current = codeMirror
     //// Create Firepad (with rich text toolbar and shortcuts enabled).
+    //could put user ID here
     let firepad = window.Firepad.fromCodeMirror(firepadRef, codeMirror,
-        { defaultText: '// JavaScript Editing with Firepad!\nfunction go() {\n  var message = "Hello, world.";\n  console.log(message);\n}'});
+        { defaultText: `${commentType[0]}Welcome to your ${language_name} editor!${commentType[1]}`});
     //// Initialize contents.
     firepad.on('ready', function() {
       // if (firepad.isHistoryEmpty()) {
@@ -46,8 +62,8 @@ const codeMirrorRef= useRef()
       // }
     });
   }else{
-    console.log(codeMirrorRef)
-    codeMirrorRef.current.options.mode = language_name
+    // console.log(codeMirrorRef)
+    // codeMirrorRef.current.options.mode = language_name
   }
   }, [language_name])
 

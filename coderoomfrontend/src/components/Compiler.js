@@ -15,31 +15,8 @@ const Compiler = () => {
   const [language_id, setLanguage_id] = useState(63);
   const [language_name, setLanguage_name] = useState('javascript');
   const [user_input, setUser_input] = useState('');
-  const [codeLines, setCodeLines] = useState()
+  const [compiledData, setCompiledData] = useState({})
 
-
-  // const handleLanguageChange = (target) => {
-  //   setLanguage_id(target.value)
-  //   let languageByName
-  //   switch(target.value){
-  //     case '63':
-  //       languageByName=  'javascript'
-  //       break
-  //     case '75':
-  //       languageByName = 'c'
-  //       break
-  //     case '54':
-  //       languageByName = 'c++'
-  //       break
-  //     case '62':
-  //       languageByName = 'java'
-  //       break
-  //     case '71':
-  //       languageByName = 'python'
-  //       break
-  //   }
-  //   setLanguage_name(languageByName)
-  // }
 
 
   const observeCodeChange = () => {
@@ -81,6 +58,13 @@ const Compiler = () => {
       getTextFromCodeEditor()
       observeCodeChange()
     }, [])
+
+
+  const submitToInstructor = () => {
+    //API CALL HERE 
+    //send 'input' to teacher.
+console.log({...compiledData, inputCode: input}, )
+  }
 
 
   const submit = async (e) => {
@@ -139,15 +123,16 @@ const Compiler = () => {
 
 
         jsonGetSolution = await getSolution.json();
-        console.log('jsongetsolution', jsonGetSolution)
       }
     }
     if (jsonGetSolution.stdout) {
       const outputSolution = atob(jsonGetSolution.stdout);
+      console.log('jsongetsolution', jsonGetSolution)
 
       outputText.innerHTML = "";
 
       outputText.innerHTML += `Results : ${outputSolution}\nExecution Time : ${jsonGetSolution.time} Secs\nMemory used : ${jsonGetSolution.memory} bytes`;
+      setCompiledData({time: jsonGetSolution.time, memory: jsonGetSolution.memory, token : jsonGetSolution.token})
     } else if (jsonGetSolution.stderr) {
       const error = atob(jsonGetSolution.stderr);
 
@@ -173,8 +158,14 @@ const Compiler = () => {
                 Language: {language_name}
 
               </span>
+              <button
+              type="submit"
+              className="btn btn-danger ml-2 mr-2 "
+              onClick={() => submitToInstructor()}
+            >
+              Submit Code
+            </button>
             </label>
-            {/* <TextEditor fieldName={'solution'} fieldId={'source'} onChangeFunction={setInput} classNames="source"/> */}
             <FirePad language_name={language_name} />
 
 
@@ -185,22 +176,6 @@ const Compiler = () => {
             >
               <i class="fas fa-cog fa-fw"></i> Run
             </button>
-
-            {/* <label for="tags" className="mr-1">
-              <b className="heading">Language:</b>
-            </label>
-            <select
-              value={language_id}
-              onChange={(event) => handleLanguageChange(event.target)}
-              id="tags"
-              className="form-control form-inline mb-2 language"
-            >
-              <option value="63">Javascript</option>
-              <option value="75">C</option>
-              <option value="54">C++</option>
-              <option value="62">Java</option>
-              <option value="71">Python</option>
-            </select> */}
           </div>
           <div className="col-5">
             <div>
